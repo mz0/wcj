@@ -1,0 +1,8 @@
+plugins {
+    // Support convention plugins written in Groovy.
+    id 'groovy-gradle-plugin'
+}
+
+repositories {
+    //gradlePluginPortal()
+}

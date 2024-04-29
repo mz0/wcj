@@ -1,0 +1,37 @@
+plugins {
+  id 'org.jetbrains.kotlin.jvm' version '1.9.22' apply false
+}
+
+ext {
+    pgJdbcVer = '42.7.3'
+    mysqlJdbcVer = '8.3.0'
+    assertjVer = '3.25.3'
+    log4jVer = '2.23.1'
+    gsonVer = '2.10'
+    guavaVer = '33.1.0-jre'
+    nettyVer = '4.1.108.Final'
+    jupiterVer = '5.10.2'
+    reactorVer = '3.6.5'
+    vertxVer = '4.5.7' // on update do not forget to align $jacksonVer
+}
+
+subprojects {
+    apply plugin: 'java'
+    //apply plugin: 'kotlin'
+
+    java {
+	toolchain { languageVersion = JavaLanguageVersion.of(21) }
+    }
+
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile) {
+     // compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11) }
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        //implementation("com.mysql:mysql-connector-j:$mysqlJdbcVer")
+    }
+}

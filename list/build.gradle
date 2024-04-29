@@ -1,0 +1,9 @@
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    testImplementation("org.assertj:assertj-core:$assertjVer")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:$jupiterVer")
+    testImplementation 'org.junit.platform:junit-platform-launcher'
+}
