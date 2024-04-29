@@ -2,6 +2,8 @@ plugins {
   id 'org.jetbrains.kotlin.jvm' version '1.9.22' apply false
 }
 
+apply plugin: net.x320.build.GitStatus
+println("Git branch: $currentBranch")
 ext {
     pgJdbcVer = '42.7.3'
     mysqlJdbcVer = '8.3.0'
@@ -20,11 +22,11 @@ subprojects {
     //apply plugin: 'kotlin'
 
     java {
-	toolchain { languageVersion = JavaLanguageVersion.of(21) }
+	    toolchain { languageVersion = JavaLanguageVersion.of(21) }
     }
 
-    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile) {
-     // compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11) }
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile).configureEach {
+        compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21) }
     }
 
     repositories {

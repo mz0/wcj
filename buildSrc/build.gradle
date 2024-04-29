@@ -1,8 +1,13 @@
 plugins {
     // Support convention plugins written in Groovy.
-    id 'groovy-gradle-plugin'
+    id 'groovy'
 }
 
 repositories {
+    mavenCentral()
     //gradlePluginPortal()
+}
+
+dependencies {
+    implementation("org.eclipse.jgit:org.eclipse.jgit:[6.0,7.0[")
 }
