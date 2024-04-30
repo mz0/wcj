@@ -2,19 +2,20 @@ plugins {
   id 'org.jetbrains.kotlin.jvm' version '1.9.22' apply false
 }
 
-apply plugin: net.x320.build.GitStatus
-println("Git branch: $currentBranch")
+//apply plugin: net.x320.build.GitStatus
+//println("Git branch: $currentBranch")
 ext {
     pgJdbcVer = '42.7.3'
     mysqlJdbcVer = '8.3.0'
     assertjVer = '3.25.3'
-    log4jVer = '2.23.1'
+    log4jVer = '[2.0,3.0['
     gsonVer = '2.10'
+    jacksonVer = '2.16.1'
     guavaVer = '33.1.0-jre'
     nettyVer = '4.1.108.Final'
     jupiterVer = '5.10.2'
     reactorVer = '3.6.5'
-    vertxVer = '4.5.7' // on update do not forget to align $jacksonVer
+    vertxVer = '4.5.7' // on update align $jacksonVer, $nettyVer
 }
 
 subprojects {

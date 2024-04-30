@@ -1,4 +1,4 @@
-package net.x320.app;
+package net.x320.wcj;
 
 import org.junit.jupiter.api.Test;
 
