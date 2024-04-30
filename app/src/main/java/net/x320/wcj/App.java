@@ -6,6 +6,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
+import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevWalk;
 
@@ -36,9 +37,23 @@ public class App {
                 }
                 logger.debug("Found HEAD {}", headObjectId.name());
                 logger.info("`git status` is \"clean\": {}", isClean(repo));
+                printTags(repo, walk);
             }
         } catch (IOException ex) {
             logger.error("Error reading .git/ in {}", currentDir, ex);
+        } catch (GitAPIException ex) {
+            logger.error("Error reading Git status in {}", currentDir, ex);
+        }
+    }
+
+    private static void printTags(Repository repo, RevWalk walk) throws IOException {
+        for (var ref : repo.getRefDatabase().getRefsByPrefix(Constants.R_TAGS)) {
+            var tag = repo.getRefDatabase().peel(ref);
+            // only annotated tags return a peeled object id
+            var objectId = tag.getPeeledObjectId() == null ? tag.getObjectId() : tag.getPeeledObjectId();
+            var commit = walk.parseCommit(objectId);
+            var tagName = Repository.shortenRefName(ref.getName());
+            logger.info("Found tag {} - commit {}", tagName, commit.name());
         }
     }
 
