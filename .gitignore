@@ -1,6 +1,7 @@
 .gradle/
 /.idea/
-build/
-*/build/
+/buildSrc/build/
+/app/build/
+/lib/build/
 /app/logs/
 /logs/

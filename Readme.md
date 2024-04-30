@@ -4,7 +4,7 @@ Copyright 2024 Mark Zhitomirski <mz@exactpro.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");  
 you may not use this project files except in compliance with the License.  
-You may see the license below or obtain a copy of it at  
+You may see [the License here](LICENSE) or obtain a copy of it at  
 
     http://www.apache.org/licenses/LICENSE-2.0  
 
