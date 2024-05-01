@@ -1,3 +1,8 @@
+/*
+ Immensely grateful to Andrew Oberstar <andrew@ajoberstar.org>
+ for his 'reckon' Gradle plugin
+ github.com/ajoberstar/reckon
+ */
 package net.x320.wcj;
 
 import org.apache.logging.log4j.LogManager;
@@ -8,12 +13,16 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.revwalk.filter.RevFilter;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class App {
     private static final Logger logger = LogManager.getLogger();
@@ -38,12 +47,26 @@ public class App {
                 logger.debug("Found HEAD {}", headObjectId.name());
                 logger.info("`git status` is \"clean\": {}", isClean(repo));
                 printTags(repo, walk);
+                var headCommit = walk.parseCommit(headObjectId);
+                revList(walk, headCommit);
             }
         } catch (IOException ex) {
             logger.error("Error reading .git/ in {}", currentDir, ex);
         } catch (GitAPIException ex) {
             logger.error("Error reading Git status in {}", currentDir, ex);
         }
+    }
+
+    private static List<RevCommit> revList(RevWalk walk, RevCommit start) throws IOException {
+        walk.reset();
+        walk.setRevFilter(RevFilter.ALL);
+        walk.markStart(start);
+        ArrayList<RevCommit> commits = new ArrayList<>();
+        for (RevCommit commit : walk) {
+            logger.info("commit: {}", commit.toObjectId().name());
+            commits.add(commit);
+        }
+        return commits;
     }
 
     private static void printTags(Repository repo, RevWalk walk) throws IOException {
