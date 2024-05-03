@@ -44,9 +44,9 @@ public class App {
                 if (headObjectId == null) {
                     logger.warn("No HEAD commit. Presuming repo is empty.");
                 }
-                logger.debug("Found HEAD {}", headObjectId.name());
+                logger.debug("Found HEAD {}", headObjectId == null ? "Error: not found" : headObjectId.name());
                 logger.info("`git status` is \"clean\": {}", isClean(repo));
-                printTags(repo, walk, true, 1000);
+                printTags(repo, walk, false);
                 var headCommit = walk.parseCommit(headObjectId);
                 revList(walk, headCommit);
             }
@@ -69,22 +69,19 @@ public class App {
         return commits;
     }
 
-    private static void printTags(Repository repo, RevWalk walk, boolean onlyAnnotated, int depth) throws IOException {
-        if (depth < 1) return;
-        var d = 0;
+    private static void printTags(Repository repo, RevWalk walk, boolean onlyAnnotated) throws IOException {
+        var counter = 0;
         for (var ref : repo.getRefDatabase().getRefsByPrefix(Constants.R_TAGS)) {
             var tag = repo.getRefDatabase().peel(ref);
             // only annotated tags return a peeled object id
             var isLightweight = tag.getPeeledObjectId() == null;
             var objectId =  !onlyAnnotated && isLightweight ? tag.getObjectId() : tag.getPeeledObjectId();
             if (objectId != null) {
-                d++;
+                counter++;
                 var commit = walk.parseCommit(objectId);
                 var tagName = Repository.shortenRefName(ref.getName());
-                logger.info("Found tag {} at depth {} - commit {} annotated: {}",
-                        tagName, d, commit.name(), !isLightweight);
-                depth--;
-                if (depth < 1) break;
+                logger.info("Found tag {} - {} - commit {} annotated: {}",
+                        counter, tagName, commit.name(), !isLightweight);
             } else {
                 var clarification = onlyAnnotated ? "annotated " : "";
                 logger.info("no {}tags found", clarification);
