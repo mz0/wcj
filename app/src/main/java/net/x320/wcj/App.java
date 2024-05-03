@@ -46,7 +46,7 @@ public class App {
                 }
                 logger.debug("Found HEAD {}", headObjectId.name());
                 logger.info("`git status` is \"clean\": {}", isClean(repo));
-                printTags(repo, walk);
+                printTags(repo, walk, true, 1000);
                 var headCommit = walk.parseCommit(headObjectId);
                 revList(walk, headCommit);
             }
@@ -69,14 +69,26 @@ public class App {
         return commits;
     }
 
-    private static void printTags(Repository repo, RevWalk walk) throws IOException {
+    private static void printTags(Repository repo, RevWalk walk, boolean onlyAnnotated, int depth) throws IOException {
+        if (depth < 1) return;
+        var d = 0;
         for (var ref : repo.getRefDatabase().getRefsByPrefix(Constants.R_TAGS)) {
             var tag = repo.getRefDatabase().peel(ref);
             // only annotated tags return a peeled object id
-            var objectId = tag.getPeeledObjectId() == null ? tag.getObjectId() : tag.getPeeledObjectId();
-            var commit = walk.parseCommit(objectId);
-            var tagName = Repository.shortenRefName(ref.getName());
-            logger.info("Found tag {} - commit {}", tagName, commit.name());
+            var isLightweight = tag.getPeeledObjectId() == null;
+            var objectId =  !onlyAnnotated && isLightweight ? tag.getObjectId() : tag.getPeeledObjectId();
+            if (objectId != null) {
+                d++;
+                var commit = walk.parseCommit(objectId);
+                var tagName = Repository.shortenRefName(ref.getName());
+                logger.info("Found tag {} at depth {} - commit {} annotated: {}",
+                        tagName, d, commit.name(), !isLightweight);
+                depth--;
+                if (depth < 1) break;
+            } else {
+                var clarification = onlyAnnotated ? "annotated " : "";
+                logger.info("no {}tags found", clarification);
+            }
         }
     }
 
