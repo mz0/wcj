@@ -2,8 +2,8 @@ plugins {
   id 'org.jetbrains.kotlin.jvm' version '1.9.22' apply false
 }
 
-//apply plugin: net.x320.build.GitStatus
-//println("Git branch: $currentBranch")
+apply plugin: net.x320.build.SemVerGit
+println("Git branch: ${projectInfo.currentBranch}; Full version: ${projectInfo.fullVersion}")
 ext {
     pgJdbcVer = '42.7.3'
     mysqlJdbcVer = '8.3.0'
