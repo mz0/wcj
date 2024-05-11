@@ -22,7 +22,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class App {
     private static final Logger logger = LogManager.getLogger();
@@ -46,9 +48,11 @@ public class App {
                 }
                 logger.debug("Found HEAD {}", headObjectId == null ? "Error: not found" : headObjectId.name());
                 logger.info("`git status` is \"clean\": {}", isClean(repo));
-                printTags(repo, walk, false);
+                final String semVer = "^v\\d{1,2}\\.\\d{1,4}\\.\\d{1,3}$";
+                getTags(repo, walk, true, semVer);
                 var headCommit = walk.parseCommit(headObjectId);
-                revList(walk, headCommit);
+                var rcl = revList(walk, headCommit);
+                logger.info("rcl.size: {}", rcl.size());
             }
         } catch (IOException ex) {
             logger.error("Error reading .git/ in {}", currentDir, ex);
@@ -69,24 +73,27 @@ public class App {
         return commits;
     }
 
-    private static void printTags(Repository repo, RevWalk walk, boolean onlyAnnotated) throws IOException {
-        var counter = 0;
+    private static Map<String, RevCommit> getTags(Repository repo, RevWalk walk, boolean onlyAnnotated, String match)
+            throws IOException
+    {
+        var result = new HashMap<String, RevCommit>();
         for (var ref : repo.getRefDatabase().getRefsByPrefix(Constants.R_TAGS)) {
             var tag = repo.getRefDatabase().peel(ref);
             // only annotated tags return a peeled object id
             var isLightweight = tag.getPeeledObjectId() == null;
             var objectId =  !onlyAnnotated && isLightweight ? tag.getObjectId() : tag.getPeeledObjectId();
             if (objectId != null) {
-                counter++;
                 var commit = walk.parseCommit(objectId);
                 var tagName = Repository.shortenRefName(ref.getName());
-                logger.info("Found tag {} - {} - commit {} annotated: {}",
-                        counter, tagName, commit.name(), !isLightweight);
-            } else {
-                var clarification = onlyAnnotated ? "annotated " : "";
-                logger.info("no {}tags found", clarification);
+                if (tagName.matches(match)) {
+                    result.put(tagName, commit);
+                    logger.info("Found tag {} - commit {} annotated: {}",
+                        tagName, commit.name(), !isLightweight);
+                }
+
             }
         }
+        return result;
     }
 
     private static boolean isClean(Repository repo) throws GitAPIException {
@@ -99,12 +106,8 @@ public class App {
         if (!stat.isClean() && logger.isTraceEnabled()) {
             logger.trace("Git status: added={}, changed={}, removed={},"
                         + " untracked={}, modified={}, missing={}",
-                stat.getAdded(),
-                stat.getChanged(),
-                stat.getRemoved(),
-                stat.getUntracked(),
-                stat.getModified(),
-                stat.getMissing()
+                stat.getAdded(), stat.getChanged(), stat.getRemoved(),
+                stat.getUntracked(), stat.getModified(), stat.getMissing()
             );
         }
     }
