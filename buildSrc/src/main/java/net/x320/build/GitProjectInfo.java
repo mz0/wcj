@@ -3,6 +3,7 @@ package net.x320.build;
 import org.eclipse.jgit.api.Status;
 
 public class GitProjectInfo {
+    public static final String MAINLINE_PROPERTY = "MAINLINE";
     private final String currentBranch;
     private final String currentTag;
     private final String fullVersion;

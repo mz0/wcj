@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import static net.x320.build.GitProjectInfo.MAINLINE_PROPERTY;
 import static net.x320.build.SemVer.semVer;
 
 public class GitProjectSurveyor {
@@ -36,6 +37,8 @@ public class GitProjectSurveyor {
              var walk = new RevWalk(reader)
         ) {
             currBranch = repo.getBranch();
+            // TODO refactor
+            if ("main".equals(currBranch)) System.setProperty(MAINLINE_PROPERTY, "True");
             if (currBranch == null) {
                 throw new IOException(String.format("%s is unlikely a Git repo", gitPath));
             }
@@ -52,13 +55,22 @@ public class GitProjectSurveyor {
             var latestTag = semVerOptional.get();
             var headCommit = walk.parseCommit(headObjectId);
             var rcl = revList(walk, headCommit, latestTag.getValue().toObjectId());
-            var buildSuffix = !rcl.isEmpty() ? "+" + rcl.size() : "";
+            var betaSuffix = treeStatus.isClean() && isMainline() ? "" : "-beta";
+            var buildSuffix = betaSuffix + (!rcl.isEmpty() ? "+" + rcl.size() : "");
             baseTag = latestTag.getKey();
             fullVersion = baseTag + buildSuffix;
         } catch (GitAPIException ex) {
             throw new IOException(String.format("Error reading Git status in %s", gitPath), ex);
         }
         return new GitProjectInfo(currBranch, baseTag, fullVersion, treeStatus);
+    }
+
+    private boolean isMainline() {
+        // TODO CI_COMMIT_BRANCH - Available in branch pipelines, including pipelines for the default branch.
+        //  Not available in merge request pipelines or tag pipelines; CI_DEFAULT_BRANCH;
+        //  CI_COMMIT_REF_NAME - The branch or tag name for which project is built;
+        //  https://docs.gitlab.com/ee/ci/variables/predefined_variables.html
+        return Boolean.getBoolean(MAINLINE_PROPERTY);
     }
 
     private static List<RevCommit> revList(RevWalk walk, RevCommit start, ObjectId end) throws IOException {
