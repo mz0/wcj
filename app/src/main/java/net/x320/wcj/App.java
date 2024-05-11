@@ -12,6 +12,7 @@ import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
@@ -22,12 +23,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 public class App {
     private static final Logger logger = LogManager.getLogger();
+    final static int maxDigitsMajor = 2; // 99 < 214; see ordinal() comment
+    final static int maxDigitsMinor = 4; // Dec. 31 => 1231 < 7483
+    final static int maxDigitsPatch = 3;
+    final static String semVer = String.format("^v(\\d{1,%d})\\.(\\d{1,%d})\\.(\\d{1,%d})$",
+            maxDigitsMajor, maxDigitsMinor, maxDigitsPatch);
+
     public static void main(String[] args) {
         var currentDir = Paths.get("").toAbsolutePath();
         try {
@@ -48,11 +58,15 @@ public class App {
                 }
                 logger.debug("Found HEAD {}", headObjectId == null ? "Error: not found" : headObjectId.name());
                 logger.info("`git status` is \"clean\": {}", isClean(repo));
-                final String semVer = "^v\\d{1,2}\\.\\d{1,4}\\.\\d{1,3}$";
-                getTags(repo, walk, true, semVer);
+                var semVerOptional = getLatest(getTags(repo, walk, true, semVer));
+                if (!semVerOptional.isPresent()) {
+                    throw new IllegalStateException(String.format("no semVer tags matching \"%s\" found ", semVer));
+                }
+                var latestTag = semVerOptional.get();
                 var headCommit = walk.parseCommit(headObjectId);
-                var rcl = revList(walk, headCommit);
-                logger.info("rcl.size: {}", rcl.size());
+                var rcl = revList(walk, headCommit, latestTag.getValue().toObjectId());
+                var buildSuffix = rcl.size() > 0 ? "+" + rcl.size() : "";
+                logger.info("this version is {}{}", latestTag.getKey(), buildSuffix);
             }
         } catch (IOException ex) {
             logger.error("Error reading .git/ in {}", currentDir, ex);
@@ -61,16 +75,39 @@ public class App {
         }
     }
 
-    private static List<RevCommit> revList(RevWalk walk, RevCommit start) throws IOException {
+    private static List<RevCommit> revList(RevWalk walk, RevCommit start, ObjectId end) throws IOException {
         walk.reset();
         walk.setRevFilter(RevFilter.ALL);
         walk.markStart(start);
         ArrayList<RevCommit> commits = new ArrayList<>();
         for (RevCommit commit : walk) {
-            logger.info("commit: {}", commit.toObjectId().name());
+            logger.trace("commit: {}", commit.toObjectId().name());
+            if (commit.toObjectId().equals(end)) break;
             commits.add(commit);
         }
         return commits;
+    }
+
+    private static Optional<Map.Entry<String, RevCommit>> getLatest(Map<String, RevCommit> semVerTags) {
+        return semVerTags.entrySet().stream()
+                .sorted(Comparator.comparing((Map.Entry<String, RevCommit> me) -> ordinal(me.getKey())).reversed())
+                .findFirst();
+    }
+
+    private static int ordinal(String semVerTag) {
+        int abc = 0;
+        Pattern pattern = Pattern.compile(semVer);
+        java.util.regex.Matcher matcher = pattern.matcher(semVerTag);
+        if (matcher.matches()) {
+            int a = Integer.parseInt(matcher.group(1));
+            int b = Integer.parseInt(matcher.group(2));
+            int c = Integer.parseInt(matcher.group(3));
+            if (c < 1000 && b < 7483 && a < 215) { // maxInt 214_7483_647 > 214_1231_999
+                abc = a * 10_000 * 1000 + b * 1000 + c;
+            }
+        }
+        if (logger.isTraceEnabled()) logger.trace("tag: {} - ordinal {}", semVerTag, abc);
+        return abc;
     }
 
     private static Map<String, RevCommit> getTags(Repository repo, RevWalk walk, boolean onlyAnnotated, String match)
@@ -125,9 +162,7 @@ public class App {
             path = path.getParent();
         }
         if (gitPath == null) {
-            throw new IOException(
-                    String.format("Unable to locate git repository in %s", startPath)
-            );
+            throw new IOException(String.format("Unable to locate git repository in %s", startPath));
         }
         return gitPath;
     }
