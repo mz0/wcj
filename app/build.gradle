@@ -4,15 +4,12 @@ plugins {
 
 dependencies {
     implementation project(':lib')
-    implementation("org.eclipse.jgit:org.eclipse.jgit:[6.0,7.0[")
-    implementation("org.apache.logging.log4j:log4j-api:$log4jVer")
-
-    runtimeOnly("org.apache.logging.log4j:log4j-core:$log4jVer")
-    runtimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:$log4jVer")
-
-    testImplementation("org.assertj:assertj-core:$assertjVer")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:$jupiterVer")
-    testImplementation 'org.junit.platform:junit-platform-launcher'
 }
 
-application { mainClass = 'net.x320.wcj.App' }
+application {
+    mainClass = 'net.x320.wcj.App'
+    applicationName = 'greeter'
+}
+
+tasks.named('distTar') { enabled = false } // don't make <pplicationNam>-<version>.tar
+tasks.named('installDist') { enabled = false } // 'distribution' plugin task, default install path 'projectDir/build/install/'

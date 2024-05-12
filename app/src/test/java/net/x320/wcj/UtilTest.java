@@ -14,15 +14,16 @@ class UtilTest {
     @Test
     void testGetMessage() {
         try {
-            assertThat(Util.readRsaPublicKeyDer("/home/mz0/.ssh/id_rsa.pub"));
+            Util.readRsaPublicKeyDer("/home/mz0/.ssh/id_rsa_.pub");
         } catch (NoSuchAlgorithmException | IOException | InvalidKeySpecException e) {
-            // java.security.InvalidKeyException: Unable to decode key for a regular SSH pub-file
+            // java.security.InvalidKeyException: Unable to decode key for (id_rsa is password protected)
             System.out.println(e.getMessage());
         }
         System.getenv().forEach((k, v) -> {
             if (k.startsWith("US") || k.startsWith("HO") || k.startsWith("PW"))
                 System.out.println(k + " = " + v);
         });
+        assertThat("A").isEqualToIgnoringCase("a");
         // USER = mz0; HOME = /home/mz0; PWD = /home/mz0/p/web-crawl-java/app;
         System.out.println("user.home : " + System.getProperty("user.home"));
         // java.runtime.version, java.vm.version: 21.0.2+13-Ubuntu-120.04.1
