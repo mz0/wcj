@@ -11,6 +11,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -19,15 +20,14 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 
 /**
- * 2014-06-21 https://stackoverflow.com/a/24343938/228117
+ * 2014-06-21 <a href="https://stackoverflow.com/a/24343938/228117">stackoverflow.com/a/24343938/228117</a>
  * OAEP padding
  */
 public class Util {
 
-    public static byte[] decrypt(PrivateKey key, byte[] ciphertext) throws NoSuchAlgorithmException,
+    public static byte[] decryptWith(PrivateKey key, byte[] ciphertext) throws NoSuchAlgorithmException,
             NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException
     {
         Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA1AndMGF1Padding");
@@ -35,7 +35,7 @@ public class Util {
         return cipher.doFinal(ciphertext);
     }
 
-    public byte[] encrypt(PublicKey key, byte[] plaintext) throws NoSuchAlgorithmException,
+    public byte[] encryptWith(PublicKey key, byte[] plaintext) throws NoSuchAlgorithmException,
             NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException
     {
         Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA1AndMGF1Padding");
@@ -51,12 +51,9 @@ public class Util {
         return keyFactory.generatePrivate(keySpec);
     }
 
-    public static  PublicKey readRsaPublicKeyDer(String filename) throws NoSuchAlgorithmException,
-            IOException, InvalidKeySpecException
-    {
-        var publicSpec = new X509EncodedKeySpec(readFileBytes(filename));
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        return keyFactory.generatePublic(publicSpec);
+    public static PublicKey readSshRsaPublicKey(Path file) throws NoSuchAlgorithmException,
+            IOException, InvalidKeySpecException, InvalidKeyException {
+        return KeyUtils.parseSSHPublicKey(Files.readString(file));
     }
 
 

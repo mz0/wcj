@@ -1,4 +1,3 @@
-// https://stackoverflow.com/a/54600720/228117 2019-02-08 by Taras (https://stackoverflow.com/users/769282/taras)
 package net.x320.ssh.crypt;
 
 import java.io.ByteArrayInputStream;
@@ -18,31 +17,29 @@ import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CertificateUtils {
+// 2019-02-08 by Taras (https://stackoverflow.com/users/769282/taras)
+/** 2014-06-21 <a href="https://stackoverflow.com/a/24343938/228117">stackoverflow.com/a/24343938/228117</a> */
+public class KeyUtils {
+    private static final Pattern SSH_RSA_PATTERN = Pattern.compile("ssh-rsa\\s+([A-Za-z0-9/+]+=*)\\s+.*");
     private static final int UINT32_BYTES = 4;
-    private static final byte[] INITIAL_PREFIX = new byte[]{0x00, 0x00, 0x00, 0x07, 0x73, 0x73, 0x68, 0x2d, 0x72, 0x73, 0x61};
-    private static final Pattern SSH_RSA_PATTERN = Pattern.compile("ssh-rsa[\\s]+([A-Za-z0-9/+]+=*)[\\s]+.*");
-
-// SSH-RSA key format
-//
-//        00 00 00 07             The length in bytes of the next field
-//        73 73 68 2d 72 73 61    The key type (ASCII encoding of "ssh-rsa")
-//        00 00 00 03             The length in bytes of the public exponent
-//        01 00 01                The public exponent (usually 65537, as here)
-//        00 00 01 01             The length in bytes of the modulus (here, 257)
-//        00 c3 a3...             The modulus
-
+    private static final byte[] INITIAL_PREFIX = new byte[]{0x00, 0x00, 0x00, 0x07,
+            0x73, 0x73, 0x68, 0x2d, 0x72, 0x73, 0x61};
+    /* RSA public key format  // TODO decouple "ssh-rsa" check
+      00 00 00 07             The length in bytes of the next field
+      73 73 68 2d 72 73 61    The key type (ASCII encoding of "ssh-rsa")
+      00 00 00 03             The length in bytes of the public Exponent
+      01 00 01                The public Exponent (usually 65537, as here)
+      00 00 01 01             The length in bytes of the Modulus (here, 257)
+      00 c3 a3...             The Modulus
+    */
     public static RSAPublicKey parseSSHPublicKey(String key) throws InvalidKeyException {
         Matcher matcher = SSH_RSA_PATTERN.matcher(key.trim());
         if (!matcher.matches()) {
             throw new InvalidKeyException("Key format is invalid for SSH RSA.");
         }
         String keyStr = matcher.group(1);
-
         ByteArrayInputStream is = new ByteArrayInputStream(Base64.getDecoder().decode(keyStr));
-
         byte[] prefix = new byte[INITIAL_PREFIX.length];
-
         try {
             if (INITIAL_PREFIX.length != is.read(prefix) || !Arrays.equals(INITIAL_PREFIX, prefix)) {
                 throw new InvalidKeyException("'ssh-rsa' key prefix not found");
