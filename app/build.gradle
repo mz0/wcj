@@ -1,17 +1,17 @@
 plugins {
-    id 'application'
+    id "application"
 }
 
 dependencies {
-    implementation project(':lib')
+    implementation project(":lib")
 }
 
-version = rootProject.version // same effect: tasks.named('distZip') { archiveVersion = version }
+version = rootProject.version // same effect: tasks.named("distZip") { archiveVersion = version }
 application {
-    mainClass = 'net.x320.wcj.App'
-    applicationName = 'greeter'
+    mainClass = "net.x320.wcj.App"
+    applicationName = "greeter"
 }
 
 
-tasks.named('distTar') { enabled = false } // don't make <pplicationNam>-<version>.tar
-tasks.named('installDist') { enabled = false } // 'distribution' plugin task, default install path 'projectDir/build/install/'
+tasks.named("distTar") { enabled = false } // don't make <pplicationNam>-<version>.tar
+tasks.named("installDist") { enabled = false } // 'distribution' plugin task, default install path 'projectDir/build/install/'
