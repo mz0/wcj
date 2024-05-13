@@ -6,11 +6,9 @@ import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Constants;
-import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.revwalk.filter.RevFilter;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -19,11 +17,12 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
 import static net.x320.build.GitProjectInfo.MAINLINE_PROPERTY;
-import static net.x320.build.SemVer.semVer;
+import static net.x320.build.SemVer.regEx;
 
 public class GitProjectSurveyor {
 
@@ -48,13 +47,13 @@ public class GitProjectSurveyor {
                 throw new IOException("No HEAD commit. Presuming repo is empty.");
             }
             treeStatus = getStatus(repo);
-            var semVerOptional = getLatest(getTags(repo, walk, true, semVer));
+            var semVerOptional = getLatest(getTags(repo, walk, true, regEx));
             if (semVerOptional.isEmpty()) {
-                throw new IllegalStateException(String.format("no semVer tags matching \"%s\" found ", semVer));
+                throw new IllegalStateException(String.format("no semVer tags matching \"%s\" found ", regEx));
             }
             var latestTag = semVerOptional.get();
             var headCommit = walk.parseCommit(headObjectId);
-            var rcl = revList(walk, headCommit, latestTag.getValue().toObjectId());
+            var rcl = revList(walk, headCommit, latestTag.getValue());
             var betaSuffix = treeStatus.isClean() && isMainline() ? "" : "-beta";
             var buildSuffix = betaSuffix + (!rcl.isEmpty() ? "+" + rcl.size() : "");
             baseTag = latestTag.getKey();
@@ -73,13 +72,14 @@ public class GitProjectSurveyor {
         return Boolean.getBoolean(MAINLINE_PROPERTY);
     }
 
-    private static List<RevCommit> revList(RevWalk walk, RevCommit start, ObjectId end) throws IOException {
+    /** {@link org.eclipse.jgit.revwalk.RevWalkUtils#find} analog.
+    Checked not counting annotated non-semVer tag "voXXXTag" */
+    private static List<RevCommit> revList(RevWalk walk, RevCommit start, RevCommit end) throws IOException {
         walk.reset();
-        walk.setRevFilter(RevFilter.ALL);
+        walk.markUninteresting(Objects.requireNonNull(end));
         walk.markStart(start);
-        ArrayList<RevCommit> commits = new ArrayList<>();
+        var commits = new ArrayList<RevCommit>();
         for (RevCommit commit : walk) {
-            if (commit.toObjectId().equals(end)) break;
             commits.add(commit);
         }
         return commits;
@@ -92,7 +92,7 @@ public class GitProjectSurveyor {
 
     private static int ordinal(String semVerTag) {
         int abc = 0;
-        Pattern pattern = Pattern.compile(semVer);
+        Pattern pattern = Pattern.compile(regEx);
         java.util.regex.Matcher matcher = pattern.matcher(semVerTag);
         if (matcher.matches()) {
             int a = Integer.parseInt(matcher.group(1));

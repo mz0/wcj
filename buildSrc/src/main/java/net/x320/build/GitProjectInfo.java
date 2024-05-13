@@ -9,9 +9,9 @@ public class GitProjectInfo {
     private final String fullVersion;
     private final Status treeStatus;
 
-    public GitProjectInfo(String currentBranch, String currentTag, String fullVersion, Status treeStatus) {
+    public GitProjectInfo(String currentBranch, String baseTag, String fullVersion, Status treeStatus) {
         this.currentBranch = currentBranch;
-        this.currentTag = currentTag;
+        this.currentTag = baseTag;
         this.fullVersion = fullVersion;
         this.treeStatus = treeStatus;
     }
@@ -20,7 +20,7 @@ public class GitProjectInfo {
         return currentBranch;
     }
 
-    public String getCurrentTag() {
+    public String getBaseTag() {
         return currentTag;
     }
 
