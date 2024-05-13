@@ -2,10 +2,11 @@ plugins {
   id 'org.jetbrains.kotlin.jvm' version '1.9.22' apply false
 }
 
-apply plugin: net.x320.build.SemVerGit
+apply plugin: 'semver'
+// version = projectInfo.fullVersion
 println("Git branch: ${projectInfo.currentBranch}, status clean: ${projectInfo.treeStatus.clean};"
-      + " Full version: ${projectInfo.fullVersion}")
-version = projectInfo.fullVersion // TODO it in builSrc/ ?
+      + " project.version: ${project.version}")
+
 ext {
     pgJdbcVer = "42.7.3"
     mysqlJdbcVer = "8.4.0"
