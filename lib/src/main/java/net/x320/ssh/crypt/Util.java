@@ -22,7 +22,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 
 /**
- * 2014-06-21 <a href="https://stackoverflow.com/a/24343938/228117">stackoverflow.com/a/24343938/228117</a>
  * OAEP padding
  */
 public class Util {
@@ -43,6 +42,15 @@ public class Util {
         return cipher.doFinal(plaintext);
     }
 
+    // TODO read from Agent: https://github.com/apache/mina-sshd/blob/master/sshd-core/src/main/java/
+    //  org/apache/sshd/agent/unix/AgentClient.java
+    //   For Windows see  https://stackoverflow.com/questions/12452933/putty-pageant-protocol
+    //    http://api.libssh.org/rfc/PROTOCOL.agent
+    //    https://github.com/ymnk/jsch-agent-proxy/blob/master/jsch-agent-proxy-pageant/src/main/java/
+    //  com/jcraft/jsch/agentproxy/connector/PageantConnector.java
+    //   See also
+    //  https://interworks.com/blog/2021/09/15/setting-up-ssh-agent-in-windows-for-passwordless-git-authentication/
+    //   PS> Get-Service ssh-agent | Set-Service -StartupType Automatic -PassThru | Start-Service
     public static PrivateKey readPrivateKey(String filename) throws NoSuchAlgorithmException,
             IOException, InvalidKeySpecException
     {
