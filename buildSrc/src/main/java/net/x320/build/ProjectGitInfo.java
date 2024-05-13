@@ -2,14 +2,14 @@ package net.x320.build;
 
 import org.eclipse.jgit.api.Status;
 
-public class GitProjectInfo {
+public class ProjectGitInfo {
     public static final String MAINLINE_PROPERTY = "MAINLINE";
     private final String currentBranch;
     private final String currentTag;
     private final String fullVersion;
     private final Status treeStatus;
 
-    public GitProjectInfo(String currentBranch, String baseTag, String fullVersion, Status treeStatus) {
+    public ProjectGitInfo(String currentBranch, String baseTag, String fullVersion, Status treeStatus) {
         this.currentBranch = currentBranch;
         this.currentTag = baseTag;
         this.fullVersion = fullVersion;

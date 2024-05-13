@@ -1,6 +1,6 @@
 package net.x320.build.util;
 
-import net.x320.build.GitProjectInfo;
+import net.x320.build.ProjectGitInfo;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -21,12 +21,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import static net.x320.build.GitProjectInfo.MAINLINE_PROPERTY;
+import static net.x320.build.ProjectGitInfo.MAINLINE_PROPERTY;
 import static net.x320.build.SemVer.regEx;
 
 public class GitProjectSurveyor {
 
-    public GitProjectInfo survey(Path gitPath) throws IOException {
+    public ProjectGitInfo survey(Path gitPath) throws IOException {
         String currBranch;
         String baseTag;
         String fullVersion;
@@ -61,7 +61,7 @@ public class GitProjectSurveyor {
         } catch (GitAPIException ex) {
             throw new IOException(String.format("Error reading Git status in %s", gitPath), ex);
         }
-        return new GitProjectInfo(currBranch, baseTag, fullVersion, treeStatus);
+        return new ProjectGitInfo(currBranch, baseTag, fullVersion, treeStatus);
     }
 
     private boolean isMainline() {
