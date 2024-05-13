@@ -105,7 +105,7 @@ public class GitProjectSurveyor {
         return abc;
     }
 
-    private static Map<String, RevCommit> getTags(Repository repo, RevWalk walk, boolean onlyAnnotated, String match)
+    private static Map<String, RevCommit> getTags(Repository repo, RevWalk walk, boolean onlyAnnotated, String regex)
             throws IOException
     {
         var result = new HashMap<String, RevCommit>();
@@ -117,7 +117,7 @@ public class GitProjectSurveyor {
             if (objectId != null) {
                 var commit = walk.parseCommit(objectId);
                 var tagName = Repository.shortenRefName(ref.getName());
-                if (tagName.matches(match)) {
+                if (tagName.matches(regex)) {
                     result.put(tagName, commit);
                 }
             }
