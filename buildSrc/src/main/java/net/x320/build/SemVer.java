@@ -1,5 +1,6 @@
 package net.x320.build;
 
+// TODO refactor and strip the leading 'v' from fullVersion
 public class SemVer {
     public final static int maxDigitsMajor = 2; // 99 < 214; see ordinal() comment
     public final static int maxDigitsMinor = 4; // Dec. 31 => 1231 < 7483

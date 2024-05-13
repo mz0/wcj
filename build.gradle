@@ -5,7 +5,7 @@ plugins {
 apply plugin: net.x320.build.SemVerGit
 println("Git branch: ${projectInfo.currentBranch}, status clean: ${projectInfo.treeStatus.clean};"
       + " Full version: ${projectInfo.fullVersion}")
-
+version = projectInfo.fullVersion // TODO it in builSrc/ ?
 ext {
     pgJdbcVer = '42.7.3'
     mysqlJdbcVer = '8.4.0'
