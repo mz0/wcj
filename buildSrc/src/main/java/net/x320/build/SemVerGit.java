@@ -26,7 +26,6 @@ class SemVerGit implements Plugin<Project> {
         } catch (IOException e) {
             logger.lifecycle("Git project '" + projDir + "' survey error", e);
         }
-        proj.getExtensions().add("projectInfo", survey);
         proj.setVersion(survey != null ? survey.getFullVersion() : "");
     }
 }
