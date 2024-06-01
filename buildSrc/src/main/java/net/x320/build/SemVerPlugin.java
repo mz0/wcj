@@ -14,8 +14,8 @@ import org.gradle.api.logging.Logging;
 import java.io.IOException;
 
 @SuppressWarnings("unused")
-class SemVerGit implements Plugin<Project> {
-    private final static Logger logger = Logging.getLogger(SemVerGit.class);
+class SemVerPlugin implements Plugin<Project> {
+    private final static Logger logger = Logging.getLogger(SemVerPlugin.class);
 
     @Override
     public void apply(Project proj) {

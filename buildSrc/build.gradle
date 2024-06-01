@@ -10,7 +10,7 @@ gradlePlugin {
     plugins {
         register("semver-plugin") {
             id = "semver"
-            implementationClass = "net.x320.build.SemVerGit"
+            implementationClass = "net.x320.build.SemVerPlugin"
         }
     }
 }
