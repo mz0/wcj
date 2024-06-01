@@ -1,0 +1,28 @@
+image: alpine/java:21.0.3-jdk
+stages:
+  - build-and-test
+cache:
+  key: global
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+before_script:
+    - export GRADLE_USER_HOME=`pwd`/.gradle
+
+build-and-test:
+  stage: build-and-test
+  tags:
+    - docker
+  script:
+    - ./gradlew build
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - "build/test-results/functionalTest/TEST-*.xml"
+        - "**/build/test-results/test/TEST-*.xml"
+    expire_in: 1 day
+  only:
+    - main
+    - merge_requests
+    - /^feature\/.+$/
