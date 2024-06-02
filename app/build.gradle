@@ -13,5 +13,5 @@ application {
 }
 
 
-tasks.named("distTar") { enabled = false } // don't make <pplicationNam>-<version>.tar
+tasks.named("distTar") { enabled = false } // don't make <app-name>-<version>.tar
 tasks.named("installDist") { enabled = false } // 'distribution' plugin task, default install path 'projectDir/build/install/'
