@@ -12,9 +12,9 @@ import java.net.http.HttpResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class HttpTest {
-    String formTag = """
-            <form name="login" method="post" enctype="application/x-www-form-urlencoded" action="/">
-            """;
+// JDK 21:    String formTag = """
+//            <form name="login" method="post" enctype="application/x-www-form-urlencoded" action="/">
+//            """;
 
     @Test
     void https0() throws Exception {
