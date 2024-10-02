@@ -5,6 +5,20 @@ plugins {
 apply(plugin = "semver")
 println("Building $version")
 
+sourceSets {
+    create("functionalTest") {
+        java.srcDir("functionalTest/java")
+        resources.srcDir("functionalTest/testResources")
+    }
+}
+
+task<JavaExec>("hello") {
+    group = "dev-support"
+    classpath = java.sourceSets["functionalTest"].runtimeClasspath
+    mainClass.set("com.exactpro.dump.Hello")
+}
+
+
 val log4jVer = "[2.0,3.0["
 
 subprojects {
