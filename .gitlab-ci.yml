@@ -24,7 +24,7 @@ build:
       junit:
         - "**/build/test-results/test/TEST-*.xml"
   only:
-    - master
+    - main
     - /^feature\/.+$/
 
 build-and-test:
