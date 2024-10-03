@@ -1,23 +1,21 @@
 plugins {
-    id "application"
+    id("application")
 }
 
 dependencies {
     def log4jVer = "[2.0,3.0["
-    implementation project(":lib")
+    implementation(project(":lib"))
     implementation("org.apache.logging.log4j:log4j-api:$log4jVer")
 
     runtimeOnly("org.apache.logging.log4j:log4j-core:$log4jVer")
     runtimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:$log4jVer")
-
 }
 
-version = rootProject.version // same effect: tasks.named("distZip") { archiveVersion = version }
+version = rootProject.version
 application {
     mainClass = "net.x320.wcj.App"
-    applicationName = "greeter"
+    applicationName = rootProject.name
 }
-
 
 tasks.named("distTar") { enabled = false } // don't make <app-name>-<version>.tar
 tasks.named("installDist") { enabled = false } // 'distribution' plugin task, default install path 'projectDir/build/install/'
