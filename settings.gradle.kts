@@ -1,0 +1,2 @@
+rootProject.name = "wcj"
+include("app", "lib")

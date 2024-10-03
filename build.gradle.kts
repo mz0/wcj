@@ -4,15 +4,36 @@ plugins {
 
 apply(plugin = "semver")
 println("Building $version")
+val functionalTest = "functionalTest"
 
-val log4jVer = "[2.0,3.0["
+sourceSets {
+    create(functionalTest) {
+    }
+}
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    "functionalTestImplementation"(project(":lib"))
+//    sourceSets.named(functionalTest) {
+//        implementation(project(":lib"))
+//    }
+}
+
+tasks.register<JavaExec>("hello") {
+    group = "dev-support"
+    classpath = java.sourceSets[functionalTest].runtimeClasspath
+    mainClass.set("com.exactpro.dump.Hello")
+}
+
 
 subprojects {
     apply(plugin = "java")
 
     java {
         targetCompatibility = JavaVersion.VERSION_11
-        sourceCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = targetCompatibility
     }
 
     repositories {
@@ -20,11 +41,6 @@ subprojects {
     }
 
     dependencies {
-        implementation("org.apache.logging.log4j:log4j-api:$log4jVer")
-
-        runtimeOnly("org.apache.logging.log4j:log4j-core:$log4jVer")
-        runtimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:$log4jVer")
-
         testImplementation("org.assertj:assertj-core:3.25.3")
         testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")

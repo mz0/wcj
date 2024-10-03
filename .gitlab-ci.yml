@@ -1,5 +1,6 @@
 image: ${SHSHA_DOCKER_REGISTRY}/jdk-plus-db-cli-utils:11.0.23-mysql8.4.0-pg16.3
 stages:
+  - build
   - build-and-test
 cache:
   key: global
@@ -8,6 +9,23 @@ cache:
     - .gradle/caches
 before_script:
     - export GRADLE_USER_HOME=`pwd`/.gradle
+
+build:
+  stage: build
+  tags:
+    - docker
+  script:
+    - ./gradlew build
+  artifacts:
+    paths:
+      - "app/build/distributions/"
+    expire_in: 1 week
+    reports:
+      junit:
+        - "**/build/test-results/test/TEST-*.xml"
+  only:
+    - master
+    - /^feature\/.+$/
 
 build-and-test:
   stage: build-and-test
@@ -23,6 +41,4 @@ build-and-test:
         - "**/build/test-results/test/TEST-*.xml"
     expire_in: 1 day
   only:
-    - main
     - merge_requests
-    - /^feature\/.+$/
