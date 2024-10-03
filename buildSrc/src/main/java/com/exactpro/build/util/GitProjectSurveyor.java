@@ -47,11 +47,13 @@ public class GitProjectSurveyor {
                 throw new IOException("No HEAD commit. Presuming repo is empty.");
             }
             Status treeStatus = getStatus(repo);
-            var semVerOptional = maxVersion(getTaggedVersions(repo, walk, true));
+            Optional<VersionAndCommit> semVerOptional = maxVersion(getTaggedVersions(repo, walk, true));
             if (semVerOptional.isEmpty()) {
                 throw new IllegalStateException(String.format("no semVer tags matching \"%s\" found ", TAG_PATTERN));
             }
-            var latestTag = semVerOptional.get();
+            VersionAndCommit latestTag = semVerOptional.get();
+            // System.out.printf("Latest tag: %s%n", latestTag.getCommit());
+            // Latest tag: commit 0b7117723a0caaf717e921a07a97257f33004b71 1727953750 ------p
             var headCommit = walk.parseCommit(headRef.getObjectId());
             int patchIncrement = treeStatus.isClean() ? countCommits(walk, headCommit, latestTag.getCommit()) : 0;
             SemVer gitVersion = latestTag.getVersion().withPatchIncrementedBy(patchIncrement);
