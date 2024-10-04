@@ -10,7 +10,7 @@ repositories {
 
 gradlePlugin {
     plugins {
-        register("semver-plugin") {
+        create("semverPlugin") {
             id = "semver"
             implementationClass = "com.exactpro.build.SemVerPlugin"
         }
