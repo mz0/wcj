@@ -1,10 +1,6 @@
-import org.gradle.kotlin.dsl.apply
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     java
 }
-val targetJRE = "11"
 
 repositories {
     mavenCentral()
@@ -27,7 +23,7 @@ dependencies {
 }
 
 java {
-    targetCompatibility = JavaVersion.toVersion(targetJRE)
+    targetCompatibility = JavaVersion.VERSION_11
     sourceCompatibility = targetCompatibility
 }
 

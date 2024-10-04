@@ -2,19 +2,19 @@ plugins {
   id("buildlogic.java-application-conventions")
 }
 
-println("Building $version")
-val functionalTest = "functionalTest"
+println("Building version: $version")
 
+val functionalTest = "functionalTest"
+val functionalTestImplementation = "functionalTestImplementation"
 sourceSets {
     create(functionalTest) {
     }
 }
 
+val libProject = project(":lib")
 dependencies {
-    "functionalTestImplementation"(project(":lib"))
-//    sourceSets.named(functionalTest) {
-//        implementation(project(":lib"))
-//    }
+    // type-safe 'sourceSets.named(functionalTest) { implementation(libProject) }' is OK, except confuses IDEA 2024.2
+    functionalTestImplementation(libProject)
 }
 
 tasks.register<JavaExec>("hello") {
