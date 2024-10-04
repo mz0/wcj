@@ -2,8 +2,9 @@ import org.gradle.kotlin.dsl.apply
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") apply false
+    java
 }
+val targetJRE = "11"
 
 repositories {
     mavenCentral()
@@ -25,14 +26,10 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-val targetJRE = "11"
-
 java {
     targetCompatibility = JavaVersion.toVersion(targetJRE)
     sourceCompatibility = targetCompatibility
 }
-
-kotlin.compilerOptions.jvmTarget.set(JvmTarget.fromTarget(java.targetCompatibility.majorVersion))
 
 tasks.named<Test>("test") {
     useJUnitPlatform() // fix "automatic loading deprecated",  "No tests found"
