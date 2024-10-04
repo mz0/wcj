@@ -2,7 +2,6 @@ plugins {
   id("buildlogic.java-application-conventions")
 }
 
-apply(plugin = "semver")
 println("Building $version")
 val functionalTest = "functionalTest"
 
