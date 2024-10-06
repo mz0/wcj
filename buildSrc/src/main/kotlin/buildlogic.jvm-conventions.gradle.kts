@@ -23,33 +23,26 @@ tasks.named<Test>("test") {
 }
 
 configurations.all {
-    resolutionStrategy.eachDependency {
-        if (requested.version == "") {
-            val version = findDefaultVersionInCatalog(requested.group, requested.name)
-            useVersion(version.version)
-            because(version.because)
+    resolutionStrategy {
+        val log4jVer = "[2.0,3.0["
+        defaultVersion("org.apache.logging.log4j:log4j-api:$log4jVer")
+        defaultVersion("org.apache.logging.log4j:log4j-core:$log4jVer")
+        defaultVersion("org.apache.logging.log4j:log4j-slf4j-impl:$log4jVer")
+
+        defaultVersion("org.eclipse.jgit:org.eclipse.jgit:[6.0,7.0[")  // e.g. 6.10.0.202406032230-r
+
+        // need version when employing resolutionStrategy, otherwise IllegalStateException: ...
+        // Cannot find ... for constraint runtimeElements -> org.junit.platform:junit-platform-launcher:1.11.1
+        defaultVersion("org.junit.platform:junit-platform-launcher:1.11.2")
+    }
+}
+
+fun ResolutionStrategy.defaultVersion(module: String) {
+    val (group, name, version) = module.split(':')
+    eachDependency {
+        if ((requested.group == group) && (requested.name == name) && (requested.version == "")) {
+            useVersion(version)
+            because("foo")
         }
     }
 }
-
-data class DefaultVersion(val version: String, val because: String)
-
-fun findDefaultVersionInCatalog(group: String, name: String): DefaultVersion {
-    val ga = group + ":" + name
-    if (defaultVersions.containsKey(ga)) {
-        return DefaultVersion(version = defaultVersions.get(ga)!!, because = "buildLogic")
-    }
-    throw IllegalStateException("\"$ga\" version is not configured")
-}
-
-val log4jVer = "[2.0,3.0["
-val defaultVersions = mapOf(
-    "org.apache.logging.log4j:log4j-api" to log4jVer,
-    "org.apache.logging.log4j:log4j-core" to log4jVer,
-    "org.apache.logging.log4j:log4j-slf4j-impl" to log4jVer,
-    "org.eclipse.jgit:org.eclipse.jgit" to "[6.0,7.0[",  // e.g. 6.10.0.202406032230-r
-
-    // need version when employing resolutionStrategy, otherwise IllegalStateException: ...
-    // Cannot find ... for constraint runtimeElements -> org.junit.platform:junit-platform-launcher:1.11.1
-    "org.junit.platform:junit-platform-launcher" to "1.11.2",
-)
