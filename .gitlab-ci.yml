@@ -32,7 +32,7 @@ build-and-test:
   tags:
     - docker
   script:
-    - ./gradlew build
+    - ./gradlew --warning-mode=all build
   artifacts:
     when: always
     reports:
