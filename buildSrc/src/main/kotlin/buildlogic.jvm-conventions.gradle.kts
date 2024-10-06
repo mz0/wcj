@@ -22,8 +22,14 @@ tasks.named<Test>("test") {
     testLogging.showStandardStreams = true // show StdOut and StdErr on the console
 }
 
+dependencyLocking {
+    lockMode = LockMode.STRICT
+}
+
 configurations.all {
     resolutionStrategy {
+        activateDependencyLocking() // TODO https://docs.gradle.org/current/userguide/dependency_locking.html
+
         val log4jVer = "[2.0,3.0["
         defaultVersion("org.apache.logging.log4j:log4j-api:$log4jVer")
         defaultVersion("org.apache.logging.log4j:log4j-core:$log4jVer")
