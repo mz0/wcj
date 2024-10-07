@@ -1,4 +1,4 @@
-image: ${SHSHA_DOCKER_REGISTRY}/jdk-plus-db-cli-utils:11.0.23-mysql8.4.0-pg16.3
+image: ${SHSHA_DOCKER_REGISTRY}/jdk-plus-db-cli-utils:21.0.4-mysql8.4.2-pg17.0
 stages:
   - build
   - build-and-test
@@ -8,7 +8,7 @@ cache:
     - .gradle/wrapper
     - .gradle/caches
 before_script:
-    - export GRADLE_USER_HOME=`pwd`/.gradle
+    - export GRADLE_USER_HOME=$PWD/.gradle
 
 build:
   stage: build
