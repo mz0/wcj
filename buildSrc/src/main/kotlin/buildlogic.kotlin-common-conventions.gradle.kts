@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    id("buildlogic.jvm-conventions")
+    id("buildlogic.java-common-conventions")
     id("org.jetbrains.kotlin.jvm")
 }
 
