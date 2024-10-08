@@ -1,3 +1,5 @@
+import com.exactrpo.buildext.useDefaultVersions
+
 plugins {
   id("buildlogic.java-application-conventions")
 }
@@ -10,6 +12,8 @@ sourceSets {
     create(functionalTest) {
     }
 }
+
+configurations.useDefaultVersions()
 
 val libProject = project(":lib")
 dependencies {
