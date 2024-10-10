@@ -7,8 +7,8 @@ repositories {
 }
 
 dependencies {
-    testImplementation("org.assertj:assertj-core:3.26.3")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.11.1")
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
@@ -37,9 +37,17 @@ configurations.all {
 
         defaultVersion("org.eclipse.jgit:org.eclipse.jgit:[6.0,7.0[")  // e.g. 6.10.0.202406032230-r
 
+        defaultVersion("org.assertj:assertj-core:3.26.3")
+
+        // change the next two versions in sync to not introduce new deps e.g. 'org.apiguardian:apiguardian-api'
+        val jupiterVer = "5.11.2"
+        val junitPlatform = "1.11.2"
+        defaultVersion("org.junit.jupiter:junit-jupiter-api:$jupiterVer")
+        defaultVersion("org.junit.jupiter:junit-jupiter-params:$jupiterVer")
+
         // need version when employing resolutionStrategy, otherwise IllegalStateException: ...
         // Cannot find ... for constraint runtimeElements -> org.junit.platform:junit-platform-launcher:1.11.1
-        defaultVersion("org.junit.platform:junit-platform-launcher:1.11.2")
+        defaultVersion("org.junit.platform:junit-platform-launcher:$junitPlatform")
     }
 }
 
